@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pdhpsyco_app
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - APP_URL=https://pdhpsyco.pluakdaenghospital.cloud
+      - DATABASE_URL=mysql://pdh_user:StrongPassword123@db:3306/pdhpsyco
+      - AUTH_SECRET=pdhpsyco_super_secret_auth_key_replace_me!
+      - ENCRYPTION_KEY=pdhpsyco_encryption_key_32_bytes_len_secure!
+      - TELEGRAM_BOT_TOKEN=
+      - TELEGRAM_CHAT_ID=
+      - N8N_WEBHOOK_URL=
+    ports:
+      - "127.0.0.1:3001:3001"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: pdhpsyco_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: RootPasswordSecure2026!
+      MYSQL_DATABASE: pdhpsyco
+      MYSQL_USER: pdh_user
+      MYSQL_PASSWORD: StrongPassword123
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  mysql_data:
+    driver: local

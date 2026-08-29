@@ -1,0 +1,324 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  STAFF
+  VIEWER
+}
+
+enum FormStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
+enum QuestionType {
+  radio
+  checkbox
+  number
+  text
+  scale
+}
+
+enum RiskLevel {
+  LOW
+  MODERATE
+  HIGH
+  CRITICAL
+}
+
+enum SessionStatus {
+  STARTED
+  COMPLETED
+  CANCELLED
+}
+
+enum AlertStatus {
+  NEW
+  ACKNOWLEDGED
+  CLOSED
+}
+
+enum FollowUpStatus {
+  NEW
+  CONTACTED
+  FOLLOWING
+  REFERRED
+  CLOSED
+}
+
+enum FollowUpPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+model User {
+  id            String          @id @default(uuid())
+  username      String          @unique
+  email         String          @unique
+  passwordHash  String          @map("password_hash")
+  fullName      String          @map("full_name")
+  role          Role            @default(STAFF)
+  active        Boolean         @default(true)
+  lastLogin     DateTime?       @map("last_login")
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  assignedCases FollowUpCase[]  @relation("AssignedToUser")
+  followUpNotes FollowUpNote[]
+  auditLogs     AuditLog[]
+
+  @@map("users")
+  @@index([role])
+  @@index([active])
+  @@index([createdAt])
+}
+
+model ScreeningForm {
+  id          String              @id @default(uuid())
+  code        String              @unique
+  title       String
+  description String?             @db.Text
+  version     Int                 @default(1)
+  status      FormStatus          @default(ACTIVE)
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  // Relations
+  questions   ScreeningQuestion[]
+  riskRules   RiskRule[]
+  sessions    ScreeningSession[]
+
+  @@map("screening_forms")
+  @@index([status])
+  @@index([createdAt])
+}
+
+model ScreeningQuestion {
+  id            String            @id @default(uuid())
+  formId        String            @map("form_id")
+  questionOrder Int               @map("question_order")
+  questionText  String            @map("question_text") @db.Text
+  questionType  QuestionType      @default(radio) @map("question_type")
+  required      Boolean           @default(true)
+  createdAt     DateTime          @default(now()) @map("created_at")
+  updatedAt     DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  form          ScreeningForm     @relation(fields: [formId], references: [id], onDelete: Cascade)
+  options       ScreeningOption[]
+  answers       ScreeningAnswer[]
+
+  @@map("screening_questions")
+  @@index([formId])
+  @@index([questionOrder])
+}
+
+model ScreeningOption {
+  id         String            @id @default(uuid())
+  questionId String            @map("question_id")
+  label      String
+  value      String
+  score      Int               @default(0)
+  order      Int               @default(0)
+
+  // Relations
+  question   ScreeningQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  answers    ScreeningAnswer[]
+
+  @@map("screening_options")
+  @@index([questionId])
+}
+
+model RiskRule {
+  id             String        @id @default(uuid())
+  formId         String        @map("form_id")
+  minScore       Int           @map("min_score")
+  maxScore       Int           @map("max_score")
+  riskLevel      RiskLevel     @map("risk_level")
+  recommendation String        @db.Text
+  active         Boolean       @default(true)
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  form           ScreeningForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@map("risk_rules")
+  @@index([formId])
+  @@index([riskLevel])
+  @@index([active])
+}
+
+model ScreeningSession {
+  id          String            @id @default(uuid())
+  publicToken String            @unique @map("public_token")
+  formId      String            @map("form_id")
+  startedAt   DateTime          @default(now()) @map("started_at")
+  completedAt DateTime?         @map("completed_at")
+  status      SessionStatus     @default(STARTED)
+  totalScore  Int?              @map("total_score")
+  riskLevel   RiskLevel?        @map("risk_level")
+  ipHash      String?           @map("ip_hash")
+  userAgent   String?           @map("user_agent") @db.Text
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  form        ScreeningForm     @relation(fields: [formId], references: [id])
+  answers     ScreeningAnswer[]
+  participant Participant?
+  alert       Alert?
+  followUp    FollowUpCase?
+
+  @@map("screening_sessions")
+  @@index([publicToken])
+  @@index([formId])
+  @@index([status])
+  @@index([riskLevel])
+  @@index([createdAt])
+}
+
+model ScreeningAnswer {
+  id          String            @id @default(uuid())
+  sessionId   String            @map("session_id")
+  questionId  String            @map("question_id")
+  optionId    String?           @map("option_id")
+  answerValue String?           @map("answer_value") @db.Text
+  score       Int               @default(0)
+  createdAt   DateTime          @default(now()) @map("created_at")
+
+  // Relations
+  session     ScreeningSession  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  question    ScreeningQuestion @relation(fields: [questionId], references: [id])
+  option      ScreeningOption?  @relation(fields: [optionId], references: [id])
+
+  @@map("screening_answers")
+  @@index([sessionId])
+  @@index([questionId])
+}
+
+model Participant {
+  id                 String           @id @default(uuid())
+  screeningSessionId String           @unique @map("screening_session_id")
+  citizenIdEncrypted String?          @map("citizen_id_encrypted") @db.Text
+  firstNameEncrypted String?          @map("first_name_encrypted") @db.Text
+  lastNameEncrypted  String?          @map("last_name_encrypted") @db.Text
+  phoneEncrypted     String?          @map("phone_encrypted") @db.Text
+  age                Int?
+  gender             String?
+  district           String?
+  consent            Boolean          @default(false)
+  createdAt          DateTime         @default(now()) @map("created_at")
+
+  // Relations
+  session            ScreeningSession @relation(fields: [screeningSessionId], references: [id], onDelete: Cascade)
+
+  @@map("participants")
+  @@index([screeningSessionId])
+  @@index([age])
+  @@index([gender])
+  @@index([createdAt])
+}
+
+model Alert {
+  id                 String           @id @default(uuid())
+  screeningSessionId String           @unique @map("screening_session_id")
+  severity           RiskLevel        @default(HIGH)
+  status             AlertStatus      @default(NEW)
+  acknowledgedAt     DateTime?        @map("acknowledged_at")
+  acknowledgedBy     String?          @map("acknowledged_by")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  session            ScreeningSession @relation(fields: [screeningSessionId], references: [id], onDelete: Cascade)
+
+  @@map("alerts")
+  @@index([severity])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model FollowUpCase {
+  id                 String           @id @default(uuid())
+  screeningSessionId String           @unique @map("screening_session_id")
+  assignedTo         String?          @map("assigned_to")
+  status             FollowUpStatus   @default(NEW)
+  priority           FollowUpPriority @default(NORMAL)
+  nextFollowUpDate   DateTime?        @map("next_follow_up_date")
+  createdAt          DateTime         @default(now()) @map("created_at")
+  updatedAt          DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  session            ScreeningSession @relation(fields: [screeningSessionId], references: [id], onDelete: Cascade)
+  assignedUser       User?            @relation("AssignedToUser", fields: [assignedTo], references: [id])
+  notes              FollowUpNote[]
+
+  @@map("follow_up_cases")
+  @@index([status])
+  @@index([priority])
+  @@index([assignedTo])
+  @@index([nextFollowUpDate])
+  @@index([createdAt])
+}
+
+model FollowUpNote {
+  id        String       @id @default(uuid())
+  caseId    String       @map("case_id")
+  userId    String       @map("user_id")
+  note      String       @db.Text
+  createdAt DateTime     @default(now()) @map("created_at")
+
+  // Relations
+  case      FollowUpCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  user      User         @relation(fields: [userId], references: [id])
+
+  @@map("follow_up_notes")
+  @@index([caseId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?  @map("user_id")
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  metadata  String?  @db.Text
+  ipHash    String?  @map("ip_hash")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@map("audit_logs")
+  @@index([userId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+model SystemSetting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("system_settings")
+  @@index([key])
+}
