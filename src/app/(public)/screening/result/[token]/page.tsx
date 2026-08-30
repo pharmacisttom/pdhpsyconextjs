@@ -158,6 +158,51 @@ export default async function ScreeningResultPage({ params }: ResultPageProps) {
           </CardContent>
         </Card>
 
+        {/* Smart Next Assessment Recommendation (2Q -> 9Q or 9Q -> 8Q) */}
+        {formCode === '2Q' && totalScore >= 1 && (
+          <Card className="border-2 border-teal-500 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950/40 dark:to-cyan-950/40 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-teal-900 dark:text-teal-200 text-lg font-bold flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-teal-600 animate-pulse" />
+                <span>🧠 ระบบแนะนำอัจฉริยะ: ประเมินแบบคัดกรองโรคซึมเศร้า 9Q ต่อเนื่อง</span>
+              </CardTitle>
+              <CardDescription className="text-teal-800/90 dark:text-teal-300 text-xs leading-relaxed">
+                เนื่องจากผลการคัดกรอง 2Q ของท่านได้คะแนน {totalScore} คะแนน (มีแนวโน้มความเสี่ยง) ทางโรงพยาบาลปลวกแดงแนะนำให้ทำ <strong>แบบประเมินโรคซึมเศร้า 9 คำถาม (9Q)</strong> ต่อทันที เพื่อช่วยประเมินระดับความรุนแรงและรับคำแนะนำในการดูแลรักษาที่ถูกต้อง
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/screening?form=9Q" className="block">
+                <Button variant="teal" className="w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-md shadow-teal-500/25 text-sm sm:text-base">
+                  <span>เริ่มทำแบบประเมิน 9Q ทันที</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
+
+        {formCode === '9Q' && totalScore >= 7 && (
+          <Card className="border-2 border-orange-400 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 shadow-lg">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-amber-900 dark:text-amber-200 text-lg font-bold flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-orange-600" />
+                <span>🧠 แนะนำทำแบบประเมินความเสี่ยงการทำร้ายตนเอง (8Q)</span>
+              </CardTitle>
+              <CardDescription className="text-amber-800/90 dark:text-amber-300 text-xs leading-relaxed">
+                เนื่องจากผลคะแนน 9Q ของท่านอยู่ในเกณฑ์ที่มีภาวะซึมเศร้า ควรได้รับการประเมินความเสี่ยงต่อการทำร้ายตนเอง (8Q) เพิ่มเติม
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Link href="/screening?form=8Q" className="block">
+                <Button variant="teal" className="w-full py-5 rounded-2xl font-bold flex items-center justify-center gap-2 shadow-md shadow-teal-500/25 text-sm sm:text-base">
+                  <span>ทำแบบประเมิน 8Q ต่อทันที</span>
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </CardContent>
+          </Card>
+        )}
+
         {/* High / Critical Risk Urgent Assistance Box */}
         {needsUrgentHelp && (
           <Card className="border-rose-300 dark:border-rose-800 bg-rose-50/80 dark:bg-rose-950/40 shadow-xl">
@@ -178,10 +223,10 @@ export default async function ScreeningResultPage({ params }: ResultPageProps) {
                     <span>โทรสายด่วน 1323 (ฟรี 24 ชม.)</span>
                   </Button>
                 </a>
-                <a href="tel:038659070" className="block">
+                <a href="tel:033650413,115" className="block">
                   <Button variant="teal" className="w-full py-6 rounded-2xl text-base font-bold flex items-center justify-center gap-2">
                     <PhoneCall className="h-5 w-5" />
-                    <span>ห้องฉุกเฉิน รพ.ปลวกแดง</span>
+                    <span>คลินิกจิตเวช รพ.ปลวกแดง (033 650413 ต่อ 115)</span>
                   </Button>
                 </a>
               </div>

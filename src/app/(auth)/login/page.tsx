@@ -132,10 +132,13 @@ export default function LoginPage() {
             </form>
           </CardContent>
 
-          <CardFooter className="pt-0 flex flex-col space-y-3 text-center border-t border-slate-100 dark:border-slate-800 p-6">
+          <CardFooter className="pt-0 flex flex-col space-y-2 text-center border-t border-slate-100 dark:border-slate-800 p-6">
             <div className="flex items-center justify-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
               <ShieldAlert className="h-3.5 w-3.5 text-teal-600" />
               <span>ระบบมีการบันทึก Audit Log และการเข้าใช้งานทั้งหมด</span>
+            </div>
+            <div className="pt-2 text-[11px] text-slate-400 dark:text-slate-500">
+              <span>PDHPSYCO v1.0.0 • พัฒนาโดย ภก.จัตุพล กันทะมูล</span>
             </div>
           </CardFooter>
         </Card>

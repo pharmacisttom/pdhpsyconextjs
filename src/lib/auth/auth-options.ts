@@ -10,6 +10,17 @@ export const authOptions: NextAuthOptions = {
     maxAge: 8 * 60 * 60, // 8 hours session timeout
   },
   secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'pdhpsyco_auth_secret_fallback',
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
+  },
   pages: {
     signIn: '/login',
     error: '/login',

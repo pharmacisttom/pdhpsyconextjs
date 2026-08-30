@@ -166,6 +166,14 @@ export function DashboardSidebar({ isOpen, onClose }: SidebarProps) {
             <LogOut className="h-3.5 w-3.5" />
             <span>ออกจากระบบ</span>
           </button>
+          <div className="mt-3 pt-2.5 border-t border-slate-200/70 dark:border-slate-800/70 text-center">
+            <p className="text-[11px] font-semibold text-slate-700 dark:text-slate-300">
+              PDHPSYCO <span className="text-[10px] text-teal-600 dark:text-teal-400 font-normal">v1.0.0</span>
+            </p>
+            <p className="text-[10px] text-slate-500 dark:text-slate-400">
+              พัฒนาโดย ภก.จัตุพล กันทะมูล
+            </p>
+          </div>
         </div>
       </aside>
     </>

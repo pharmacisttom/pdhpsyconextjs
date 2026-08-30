@@ -64,10 +64,10 @@ export default async function SystemSettingsPage() {
               />
             </div>
             <div>
-              <label className="block text-slate-500 font-semibold mb-1">เบอร์ห้องฉุกเฉิน (ER):</label>
+              <label className="block text-slate-500 font-semibold mb-1">เบอร์คลินิกจิตเวช (Hospital Mental Health Clinic):</label>
               <input
                 type="text"
-                defaultValue={settingsMap['hospital_er_phone'] || '038-659-070'}
+                defaultValue={settingsMap['hospital_er_phone'] || '033 650413 ต่อ 115'}
                 className="w-full h-10 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 font-medium"
               />
             </div>

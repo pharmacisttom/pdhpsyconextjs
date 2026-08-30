@@ -53,7 +53,7 @@ async function main() {
     { key: 'hospital_name', value: 'โรงพยาบาลปลวกแดง' },
     { key: 'hospital_sub_title', value: 'Pluak Daeng Hospital - จังหวัดระยอง' },
     { key: 'hotline_number', value: '1323' },
-    { key: 'hospital_er_phone', value: '038-659-070' },
+    { key: 'hospital_er_phone', value: '033 650413 ต่อ 115' },
     { key: 'emergency_phone', value: '1669' },
     { key: 'enable_telegram_notifications', value: 'true' },
     { key: 'enable_n8n_webhook', value: 'true' },

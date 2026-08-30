@@ -74,12 +74,15 @@ export default function ScreeningPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = React.useState<number>(0);
   const [answers, setAnswers] = React.useState<Record<string, { optionId?: string; score: number; answerValue?: string }>>({});
   const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState<boolean>(false);
+  const [is2QTransitionModalOpen, setIs2QTransitionModalOpen] = React.useState<boolean>(false);
+  const [completed2QToken, setCompleted2QToken] = React.useState<string | null>(null);
+  const [completed2QScore, setCompleted2QScore] = React.useState<number>(0);
 
   // Pluak Daeng Sub-districts
   const districts = ['ปลวกแดง', 'ตาสิทธิ์', 'ละหาร', 'แม่น้ำคู้', 'มาบยางพร', 'หนองไร่', 'นอกพื้นที่'];
 
   // Start screening session
-  const handleStartScreening = async () => {
+  const handleStartScreening = async (overrideFormCode?: string | React.MouseEvent) => {
     if (!consent) {
       toast.error('กรุณายินยอมตามนโยบายคุ้มครองข้อมูลส่วนบุคคล (PDPA) เพื่อทำแบบประเมิน');
       return;
@@ -87,8 +90,9 @@ export default function ScreeningPage() {
 
     setIsLoading(true);
     try {
+      const targetFormCode = typeof overrideFormCode === 'string' ? overrideFormCode : selectedFormCode;
       const payload: any = {
-        formCode: selectedFormCode,
+        formCode: targetFormCode,
         participant: {
           consent: true,
           gender,
@@ -118,10 +122,11 @@ export default function ScreeningPage() {
 
       setFormData(data.data.form);
       setPublicToken(data.data.publicToken);
+      setSelectedFormCode(targetFormCode);
       setStep('questions');
       setCurrentQuestionIndex(0);
       setAnswers({});
-      toast.success('เริ่มทำแบบประเมินเรียบร้อยแล้ว');
+      toast.success(`เริ่มทำแบบประเมิน ${data.data.form.title} เรียบร้อยแล้ว`);
     } catch (err: any) {
       toast.error(err.message || 'เกิดข้อผิดพลาดในการโหลดแบบประเมิน');
     } finally {
@@ -163,6 +168,11 @@ export default function ScreeningPage() {
     }
   };
 
+  const handleStart9QDirectly = async () => {
+    setIs2QTransitionModalOpen(false);
+    await handleStartScreening('9Q');
+  };
+
   const handleSubmitAnswers = async () => {
     if (!publicToken || !formData) return;
     setIsLoading(true);
@@ -176,6 +186,8 @@ export default function ScreeningPage() {
         score: val.score,
       }));
 
+      const totalScore = formattedAnswers.reduce((sum, item) => sum + (item.score || 0), 0);
+
       const res = await fetch(`/api/screenings/${publicToken}/complete`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -185,6 +197,15 @@ export default function ScreeningPage() {
       const result = await res.json();
       if (!res.ok || !result.success) {
         throw new Error(result.error?.message || 'เกิดข้อผิดพลาดในการบันทึกคำตอบ');
+      }
+
+      // Smart transition: If 2Q assessment score is >= 1 (or 2), prompt smart auto-transition to 9Q
+      if (formData.code === '2Q' && totalScore >= 1) {
+        setCompleted2QToken(publicToken);
+        setCompleted2QScore(totalScore);
+        setIs2QTransitionModalOpen(true);
+        setIsLoading(false);
+        return;
       }
 
       toast.success('ประเมินผลสำเร็จ กำลังนำไปยังหน้าผลลัพธ์...');
@@ -556,6 +577,60 @@ export default function ScreeningPage() {
               </Button>
               <Button variant="teal" isLoading={isLoading} onClick={handleSubmitAnswers}>
                 ยืนยันและดูผลการประเมิน
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Smart 2Q -> 9Q Transition Modal */}
+        <Modal
+          isOpen={is2QTransitionModalOpen}
+          onClose={() => {
+            setIs2QTransitionModalOpen(false);
+            if (completed2QToken) router.push(`/screening/result/${completed2QToken}`);
+          }}
+          title="🧠 ระบบอัจฉริยะแนะนำทำแบบประเมิน 9Q ต่อเนื่อง"
+          description="ผลคัดกรอง 2Q ของท่านพบสัญญาณเสี่ยง (คะแนน 2Q ได้คะแนน)"
+        >
+          <div className="space-y-4 pt-2">
+            <div className="p-4 rounded-2xl bg-gradient-to-tr from-amber-50 to-orange-50 dark:from-amber-950/40 dark:to-orange-950/40 border border-amber-200 dark:border-amber-800 space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-amber-500 text-white font-bold text-xs">
+                  {completed2QScore}/2
+                </span>
+                <span className="font-bold text-sm text-amber-900 dark:text-amber-200">
+                  ผลคัดกรอง 2Q ได้ {completed2QScore} คะแนน (ผลบวก / มีแนวโน้มเสี่ยง)
+                </span>
+              </div>
+              <p className="text-xs text-amber-800 dark:text-amber-300 leading-relaxed">
+                ตามเกณฑ์มาตรฐานทางการแพทย์ของกรมสุขภาพจิตและโรงพยาบาลปลวกแดง แนะนำให้ทำ <strong>แบบประเมินโรคซึมเศร้า 9 คำถาม (9Q) ต่อทันที</strong> เพื่อประเมินระดับความรุนแรงและแนวทางการดูแลที่แม่นยำ
+              </p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900 text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-teal-600 shrink-0" />
+              <span>ระบบจะใช้ข้อมูลเดิมที่ท่านกรอกไว้โดยอัตโนมัติ ไม่ต้องกรอกข้อมูลส่วนตัวซ้ำ</span>
+            </div>
+
+            <div className="flex flex-col sm:flex-row items-center justify-end gap-2.5 pt-3 border-t border-slate-100 dark:border-slate-800">
+              <Button
+                variant="outline"
+                className="w-full sm:w-auto text-xs"
+                onClick={() => {
+                  setIs2QTransitionModalOpen(false);
+                  if (completed2QToken) router.push(`/screening/result/${completed2QToken}`);
+                }}
+              >
+                ดูผลคะแนน 2Q ก่อน
+              </Button>
+              <Button
+                variant="teal"
+                isLoading={isLoading}
+                onClick={handleStart9QDirectly}
+                className="w-full sm:w-auto font-bold text-xs shadow-md shadow-teal-500/20 flex items-center justify-center gap-1.5"
+              >
+                <span>ทำแบบประเมิน 9Q ต่อทันที</span>
+                <ArrowRight className="h-3.5 w-3.5" />
               </Button>
             </div>
           </div>

@@ -55,29 +55,29 @@ export default function HelpEmergencyPage() {
             </CardContent>
           </Card>
 
-          {/* Hotline 2: Pluak Daeng Hospital */}
+          {/* Hotline 2: Pluak Daeng Hospital Clinic */}
           <Card className="border-teal-200 dark:border-teal-900 bg-teal-50/40 dark:bg-teal-950/20 shadow-md">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-teal-700 dark:text-teal-400">
-                  ห้องอุบัติเหตุ-ฉุกเฉิน รพ.ปลวกแดง
+                  คลินิกจิตเวช รพ.ปลวกแดง
                 </span>
                 <span className="rounded-full bg-teal-100 text-teal-800 dark:bg-teal-950 px-2 py-0.5 text-[10px] font-bold">
-                  24 ชม.
+                  วัน-เวลาราชการ
                 </span>
               </div>
-              <CardTitle className="text-3xl font-extrabold text-teal-800 dark:text-teal-300">
-                038-659-070
+              <CardTitle className="text-2xl sm:text-3xl font-extrabold text-teal-800 dark:text-teal-300">
+                033 650413 ต่อ 115
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-slate-700 dark:text-slate-300">
-                โรงพยาบาลปลวกแดง อ.ปลวกแดง จ.ระยอง หรือโทรสายด่วนหน่วยกู้ชีพฉุกเฉิน <strong>1669</strong>
+                คลินิกจิตเวช โรงพยาบาลปลวกแดง อ.ปลวกแดง จ.ระยอง หรือโทรสายด่วนหน่วยกู้ชีพฉุกเฉิน <strong>1669</strong>
               </p>
-              <a href="tel:038659070" className="block">
+              <a href="tel:033650413,115" className="block">
                 <Button variant="teal" className="w-full py-5 rounded-xl font-bold flex items-center justify-center gap-2">
                   <PhoneCall className="h-5 w-5" />
-                  <span>โทร รพ.ปลวกแดง (038-659-070)</span>
+                  <span>โทร คลินิกจิตเวช รพ.ปลวกแดง (033 650413 ต่อ 115)</span>
                 </Button>
               </a>
             </CardContent>
