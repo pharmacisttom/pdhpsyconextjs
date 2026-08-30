@@ -9,9 +9,9 @@ export function PublicFooter() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Col 1: About */}
           <div className="space-y-4 md:col-span-2">
-            <div className="flex items-center gap-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-teal-600 text-white">
-                <HeartPulse className="h-5 w-5" />
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white dark:bg-slate-800 p-1 border border-slate-200/70 dark:border-slate-700 shadow-sm overflow-hidden">
+                <img src="/pdhpsyco.png" alt="PDHPSYCO Logo" className="h-full w-full object-contain" />
               </div>
               <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
                 PDHPSYCO | โรงพยาบาลปลวกแดง

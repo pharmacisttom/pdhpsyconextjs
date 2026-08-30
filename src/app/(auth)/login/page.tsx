@@ -62,8 +62,8 @@ export default function LoginPage() {
 
         <Card className="shadow-2xl border-slate-200/80 dark:border-slate-800 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md">
           <CardHeader className="text-center pb-6">
-            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-tr from-teal-600 to-cyan-500 text-white shadow-md shadow-teal-500/25 mb-3">
-              <HeartPulse className="h-8 w-8" />
+            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-white dark:bg-slate-800 p-2 shadow-lg shadow-teal-500/10 border border-slate-200/80 dark:border-slate-700 mb-3 overflow-hidden">
+              <img src="/pdhpsyco.png" alt="PDHPSYCO Logo" className="h-full w-full object-contain" />
             </div>
             <CardTitle className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               เข้าสู่ระบบเจ้าหน้าที่

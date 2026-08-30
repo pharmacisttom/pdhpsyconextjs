@@ -13,8 +13,8 @@ export function PublicNavbar() {
       <div className="container max-w-7xl mx-auto flex h-18 items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand Logo */}
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-tr from-teal-600 to-cyan-500 text-white shadow-md shadow-teal-500/20 group-hover:scale-105 transition-transform">
-            <HeartPulse className="h-6 w-6" />
+          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white dark:bg-slate-800 p-1 shadow-md shadow-teal-500/10 border border-slate-200/60 dark:border-slate-700/60 group-hover:scale-105 transition-transform overflow-hidden">
+            <img src="/pdhpsyco.png" alt="PDHPSYCO Logo" className="h-full w-full object-contain" />
           </div>
           <div>
             <div className="flex items-center gap-1.5">

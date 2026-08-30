@@ -9,7 +9,9 @@ export const metadata: Metadata = {
   keywords: ['สุขภาพจิต', 'คัดกรองซึมเศร้า', 'โรงพยาบาลปลวกแดง', 'PDHPSYCO', '2Q', '9Q', '8Q', 'ST5', 'ระยอง'],
   authors: [{ name: 'โรงพยาบาลปลวกแดง (Pluak Daeng Hospital)' }],
   icons: {
-    icon: '/favicon.ico',
+    icon: '/pdhpsyco.png',
+    shortcut: '/pdhpsyco.png',
+    apple: '/pdhpsyco.png',
   },
 };
 

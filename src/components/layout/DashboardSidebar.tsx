@@ -102,8 +102,8 @@ export function DashboardSidebar({ isOpen, onClose }: SidebarProps) {
         {/* Brand Header */}
         <div>
           <div className="flex h-18 items-center gap-3 px-6 border-b border-slate-100 dark:border-slate-800">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-teal-600 to-cyan-500 text-white shadow-md shadow-teal-500/20">
-              <HeartPulse className="h-6 w-6" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white dark:bg-slate-800 p-1 shadow-sm border border-slate-200/70 dark:border-slate-700 overflow-hidden">
+              <img src="/pdhpsyco.png" alt="PDHPSYCO Logo" className="h-full w-full object-contain" />
             </div>
             <div>
               <div className="flex items-center gap-1">

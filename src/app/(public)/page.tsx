@@ -32,8 +32,10 @@ export default function LandingPage() {
 
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto space-y-6">
-            <div className="inline-flex items-center gap-2 rounded-full bg-teal-100/80 dark:bg-teal-950/60 px-4 py-1.5 text-xs font-semibold text-teal-800 dark:text-teal-300 border border-teal-200 dark:border-teal-800">
-              <Sparkles className="h-3.5 w-3.5" />
+            <div className="inline-flex items-center gap-2.5 rounded-full bg-white dark:bg-slate-900/90 pl-2 pr-4 py-1.5 text-xs font-semibold text-teal-800 dark:text-teal-300 border border-teal-200/80 dark:border-teal-800/80 shadow-sm">
+              <div className="h-6 w-6 rounded-full overflow-hidden flex items-center justify-center p-0.5 bg-teal-50">
+                <img src="/pdhpsyco.png" alt="PDHPSYCO Logo" className="h-full w-full object-contain" />
+              </div>
               <span>บริการคัดกรองสุขภาพจิตออนไลน์ โรงพยาบาลปลวกแดง</span>
             </div>
 
