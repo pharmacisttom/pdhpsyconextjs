@@ -135,6 +135,9 @@ export default function ScreeningsManagementPage() {
                 <option value="">-- แบบประเมินทั้งหมด --</option>
                 <option value="2Q">2Q (คัดกรองซึมเศร้า 2 ข้อ)</option>
                 <option value="9Q">9Q (ประเมินซึมเศร้า 9 ข้อ)</option>
+                <option value="PHQ-A">PHQ-A (ประเมินซึมเศร้าในวัยรุ่น)</option>
+                <option value="AUDIT">AUDIT (ประเมินการดื่มสุรา 10 ข้อ)</option>
+                <option value="FTND">FTND (ประเมินการติดบุหรี่ 6 ข้อ)</option>
                 <option value="ST-5">ST-5 (ประเมินความเครียด)</option>
                 <option value="8Q">8Q (ประเมินการฆ่าตัวตาย)</option>
               </select>
@@ -221,6 +224,9 @@ export default function ScreeningsManagementPage() {
                         </span>
                         <p className="text-[10px] text-slate-400">
                           {item.participant?.age ? `อายุ ${item.participant.age} ปี` : ''}{' '}
+                          {item.participant?.educationLevel && item.participant.educationLevel !== 'ประชาชนทั่วไป'
+                            ? `• ${item.participant.educationLevel}`
+                            : ''}
                           {item.participant?.phone ? `• โทร ${item.participant.phone}` : ''}
                         </p>
                       </td>
@@ -253,10 +259,9 @@ export default function ScreeningsManagementPage() {
                           variant="ghost"
                           size="sm"
                           onClick={() => setSelectedScreening(item)}
-                          className="h-8 rounded-lg text-xs"
+                          className="h-8 w-8 p-0 rounded-lg"
                         >
-                          <Eye className="h-3.5 w-3.5 mr-1" />
-                          <span>ดูรายละเอียด</span>
+                          <Eye className="h-4 w-4 text-teal-600" />
                         </Button>
                       </td>
                     </tr>
@@ -334,12 +339,20 @@ export default function ScreeningsManagementPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2">
-              <h4 className="font-bold text-slate-900 dark:text-white">ข้อมูลผู้รับบริการ:</h4>
-              <p>ชื่อ-นามสกุล: <strong>{selectedScreening.participant?.name}</strong></p>
-              <p>เลขบัตรประชาชน: <strong>{selectedScreening.participant?.citizenId}</strong></p>
-              <p>เบอร์โทรศัพท์: <strong>{selectedScreening.participant?.phone}</strong></p>
-              <p>อายุ: <strong>{selectedScreening.participant?.age || '-'} ปี</strong> | เพศ: <strong>{selectedScreening.participant?.gender || '-'}</strong></p>
+            <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2.5">
+              <h4 className="font-bold text-slate-900 dark:text-white border-b pb-1.5 border-slate-100 dark:border-slate-800">
+                ข้อมูลผู้รับการประเมินรายบุคคล:
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-700 dark:text-slate-300">
+                <p>1. ชื่อ-นามสกุล: <strong>{selectedScreening.participant?.name}</strong></p>
+                <p>4. เลขบัตรประชาชน: <strong>{selectedScreening.participant?.citizenId}</strong></p>
+                <p>2. วันเดือนปีเกิด: <strong>{selectedScreening.participant?.birthDate || '-'}</strong></p>
+                <p>3. อายุ: <strong>{selectedScreening.participant?.age || '-'} ปี</strong> (เพศ: {selectedScreening.participant?.gender || '-'})</p>
+                <p>6. เบอร์โทรศัพท์: <strong>{selectedScreening.participant?.phone}</strong></p>
+                <p>7. ชั้นปีที่ศึกษา: <strong>{selectedScreening.participant?.educationLevel || '-'}</strong></p>
+                <p>8. ห้อง / กลุ่มเรียน: <strong>{selectedScreening.participant?.educationRoom || '-'}</strong></p>
+                <p className="sm:col-span-2">5. ที่อยู่ปัจจุบัน: <strong>{selectedScreening.participant?.address || '-'}</strong></p>
+              </div>
             </div>
 
             <div className="flex justify-end pt-2">

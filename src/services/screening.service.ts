@@ -17,6 +17,10 @@ export interface StartSessionInput {
     firstName?: string;
     lastName?: string;
     phone?: string;
+    birthDate?: string | null;
+    address?: string | null;
+    educationLevel?: string | null;
+    educationRoom?: string | null;
     age?: number | null;
     gender?: string | null;
     district?: string | null;
@@ -80,6 +84,10 @@ export class ScreeningService {
             firstNameEncrypted: encryptPII(input.participant.firstName),
             lastNameEncrypted: encryptPII(input.participant.lastName),
             phoneEncrypted: encryptPII(input.participant.phone),
+            birthDateEncrypted: encryptPII(input.participant.birthDate || undefined),
+            addressEncrypted: encryptPII(input.participant.address || undefined),
+            educationLevel: input.participant.educationLevel || null,
+            educationRoom: input.participant.educationRoom || null,
             age: input.participant.age,
             gender: input.participant.gender,
             district: input.participant.district,

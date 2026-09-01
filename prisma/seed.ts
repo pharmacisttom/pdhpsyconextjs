@@ -431,6 +431,387 @@ async function main() {
   });
   console.log(`✅ Form 8Q seeded: ${form8Q.title}`);
 
+  // ==========================================
+  // FORM 5: PHQ-A (แบบประเมินภาวะซึมเศร้าในวัยรุ่น 9 คำถาม)
+  // ==========================================
+  const scalePHQAOptions = [
+    { label: 'ไม่มีเลย', value: '0', score: 0, order: 1 },
+    { label: 'มีบางวัน (1-7 วัน)', value: '1', score: 1, order: 2 },
+    { label: 'เป็นบ่อย (> 7 วัน)', value: '2', score: 2, order: 3 },
+    { label: 'เป็นเกือบทุกวัน', value: '3', score: 3, order: 4 },
+  ];
+
+  const questionsPHQA = [
+    'รู้สึกเบื่อ ไม่ค่อยสนใจ หรือไม่เพลิดเพลินในการทำสิ่งต่างๆ',
+    'รู้สึกเศร้า หดหู่ ท้อแท้ หรือสิ้นหวัง',
+    'หลับยาก หลับๆ ตื่นๆ หรือนอนมากจนเกินไป',
+    'รู้สึกเหนื่อยง่าย หรือไม่มีเรี่ยวแรง',
+    'เบื่ออาหาร หรือรับประทานอาหารมากเกินไป',
+    'รู้สึกแย่กับตัวเอง คิดว่าตัวเองล้มเหลว หรือทำให้ตนเองหรือครอบครัวผิดหวัง',
+    'สมาธิไม่ดีเวลาทำอะไร เช่น ทำการบ้าน อ่านหนังสือ หรือดูโทรทัศน์',
+    'พูดช้า ทำอะไรช้าลงจนคนอื่นสังเกตเห็น หรือกระสับกระส่ายอยู่ไม่สุข',
+    'มีความคิดอยากทำร้ายตนเอง หรือคิดว่าถ้าตายไปคงจะดี',
+  ];
+
+  const formPHQA = await prisma.screeningForm.upsert({
+    where: { code: 'PHQ-A' },
+    update: {},
+    create: {
+      code: 'PHQ-A',
+      title: 'แบบประเมินภาวะซึมเศร้าในวัยรุ่น (PHQ-A)',
+      description: 'แบบประเมินภาวะซึมเศร้าสำหรับวัยรุ่นและนักเรียน ในช่วง 2 สัปดาห์ที่ผ่านมา รวมทั้งวันนี้',
+      version: 1,
+      status: FormStatus.ACTIVE,
+      questions: {
+        create: questionsPHQA.map((text, idx) => ({
+          questionOrder: idx + 1,
+          questionText: text,
+          questionType: QuestionType.radio,
+          required: true,
+          options: {
+            create: scalePHQAOptions,
+          },
+        })),
+      },
+      riskRules: {
+        create: [
+          {
+            minScore: 0,
+            maxScore: 4,
+            riskLevel: RiskLevel.LOW,
+            recommendation: 'ไม่พบภาวะซึมเศร้า สุขภาพจิตอยู่ในเกณฑ์ปกติ ควรดูแลสุขภาพ พักผ่อน และทำกิจกรรมที่สร้างสรรค์',
+            active: true,
+          },
+          {
+            minScore: 5,
+            maxScore: 9,
+            riskLevel: RiskLevel.MODERATE,
+            recommendation: 'มีภาวะซึมเศร้าระดับน้อย ควรหากิจกรรมคลายเครียด ปรึกษาผู้ปกครอง ครูแนะแนว หรือผู้ที่ไว้วางใจ',
+            active: true,
+          },
+          {
+            minScore: 10,
+            maxScore: 14,
+            riskLevel: RiskLevel.HIGH,
+            recommendation: 'มีภาวะซึมเศร้าระดับปานกลาง แนะนำให้ปรึกษาผู้ปกครอง ครู และรับการตรวจประเมินเพิ่มเติมจากบุคลากรทางการแพทย์',
+            active: true,
+          },
+          {
+            minScore: 15,
+            maxScore: 27,
+            riskLevel: RiskLevel.CRITICAL,
+            recommendation: 'มีภาวะซึมเศร้าระดับรุนแรง จำเป็นต้องได้รับการดูแลและตรวจวินิจฉัยจากแพทย์/จิตแพทย์โดยเร็ว หรือติดต่อสายด่วน 1323',
+            active: true,
+          },
+        ],
+      },
+    },
+  });
+  console.log(`✅ Form PHQ-A seeded: ${formPHQA.title}`);
+
+  // ==========================================
+  // FORM 6: AUDIT (แบบประเมินพฤติกรรมการดื่มสุรา)
+  // ==========================================
+  const standardAuditScale = [
+    { label: 'ไม่เคย', value: 'never', score: 0, order: 1 },
+    { label: 'น้อยกว่าเดือนละครั้ง', value: 'less_than_monthly', score: 1, order: 2 },
+    { label: 'เดือนละครั้ง', value: 'monthly', score: 2, order: 3 },
+    { label: 'สัปดาห์ละครั้ง', value: 'weekly', score: 3, order: 4 },
+    { label: 'ทุกวันหรือเกือบทุกวัน', value: 'daily_almost_daily', score: 4, order: 5 },
+  ];
+
+  const auditYesNoScale = [
+    { label: 'ไม่เคย', value: 'no', score: 0, order: 1 },
+    { label: 'เคย แต่ไม่ใช่ในปีที่ผ่านมา', value: 'yes_not_past_year', score: 2, order: 2 },
+    { label: 'เคย ในช่วงปีที่ผ่านมา', value: 'yes_past_year', score: 4, order: 3 },
+  ];
+
+  const formAUDIT = await prisma.screeningForm.upsert({
+    where: { code: 'AUDIT' },
+    update: {},
+    create: {
+      code: 'AUDIT',
+      title: 'แบบประเมินพฤติกรรมการดื่มสุรา (AUDIT)',
+      description: 'Alcohol Use Disorders Identification Test คัดกรองพฤติกรรม ปัญหา และความเสี่ยงจากการดื่มสุรา 3 มิติ',
+      version: 1,
+      status: FormStatus.ACTIVE,
+      questions: {
+        create: [
+          {
+            questionOrder: 1,
+            questionText: 'มิติที่ 1 (ปริมาณและความถี่) ข้อ 1: คุณดื่มเครื่องดื่มที่มีแอลกอฮอล์บ่อยเพียงใด?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: [
+                { label: 'ไม่เคยเลย', value: '0', score: 0, order: 1 },
+                { label: 'เดือนละครั้งหรือน้อยกว่า', value: '1', score: 1, order: 2 },
+                { label: '2-4 ครั้งต่อเดือน', value: '2', score: 2, order: 3 },
+                { label: '2-3 ครั้งต่อสัปดาห์', value: '3', score: 3, order: 4 },
+                { label: '4 ครั้งขึ้นไปต่อสัปดาห์', value: '4', score: 4, order: 5 },
+              ],
+            },
+          },
+          {
+            questionOrder: 2,
+            questionText: 'มิติที่ 1 (ปริมาณและความถี่) ข้อ 2: ในวันที่คุณดื่มตามปกติ คุณดื่มปริมาณเท่าใด? (วัดเป็นดื่มมาตรฐาน เช่น เบียร์ 1 กระป๋อง/ เหล้า 2 ฝา)',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: [
+                { label: '1-2 ดื่มมาตรฐาน', value: '0', score: 0, order: 1 },
+                { label: '3-4 ดื่มมาตรฐาน', value: '1', score: 1, order: 2 },
+                { label: '5-6 ดื่มมาตรฐาน', value: '2', score: 2, order: 3 },
+                { label: '7-9 ดื่มมาตรฐาน', value: '3', score: 3, order: 4 },
+                { label: '10 ดื่มมาตรฐานขึ้นไป', value: '4', score: 4, order: 5 },
+              ],
+            },
+          },
+          {
+            questionOrder: 3,
+            questionText: 'มิติที่ 1 (ปริมาณและความถี่) ข้อ 3: คุณดื่มจัดหรือดื่มหนักในปริมาณมากในคราวเดียว (Binge Drinking เช่น ดื่มเบียร์ 5 กระป๋องขึ้นไปในครั้งเดียว) บ่อยแค่ไหน?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: standardAuditScale,
+            },
+          },
+          {
+            questionOrder: 4,
+            questionText: 'มิติที่ 2 (อาการติดสุรา) ข้อ 4: ในช่วงปีที่ผ่านมา มีบ่อยครั้งไหมที่คุณไม่สามารถหยุดดื่มได้เมื่อเริ่มดื่มไปแล้ว?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: standardAuditScale,
+            },
+          },
+          {
+            questionOrder: 5,
+            questionText: 'มิติที่ 2 (อาการติดสุรา) ข้อ 5: ในช่วงปีที่ผ่านมา มีบ่อยครั้งไหมที่การดื่มทำให้คุณไม่สามารถทำในสิ่งที่คาดหวังตามปกติได้ (เช่น เสียงาน เสียการเรียน)?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: standardAuditScale,
+            },
+          },
+          {
+            questionOrder: 6,
+            questionText: 'มิติที่ 2 (อาการติดสุรา) ข้อ 6: ในช่วงปีที่ผ่านมา มีบ่อยครั้งไหมที่คุณต้องดื่มในตอนเช้าหลังจากที่ดื่มหนักในคืนก่อนหน้า เพื่อให้สร่างหรือทำให้อาการดีขึ้น?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: standardAuditScale,
+            },
+          },
+          {
+            questionOrder: 7,
+            questionText: 'มิติที่ 3 (ผลกระทบจากการดื่ม) ข้อ 7: ในช่วงปีที่ผ่านมา มีบ่อยครั้งไหมที่คุณรู้สึกผิดหรือละอายใจหลังจากที่ได้ดื่มสุรา?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: standardAuditScale,
+            },
+          },
+          {
+            questionOrder: 8,
+            questionText: 'มิติที่ 3 (ผลกระทบจากการดื่ม) ข้อ 8: ในช่วงปีที่ผ่านมา มีบ่อยครั้งไหมที่คุณจำเรื่องราวไม่ได้ว่าเกิดอะไรขึ้นในคืนก่อนหน้าเพราะการดื่มสุรา?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: standardAuditScale,
+            },
+          },
+          {
+            questionOrder: 9,
+            questionText: 'มิติที่ 3 (ผลกระทบจากการดื่ม) ข้อ 9: คุณหรือผู้อื่นเคยได้รับบาดเจ็บอันเป็นผลมาจากการดื่มสุราของคุณหรือไม่?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: auditYesNoScale,
+            },
+          },
+          {
+            questionOrder: 10,
+            questionText: 'มิติที่ 3 (ผลกระทบจากการดื่ม) ข้อ 10: มีญาติ เพื่อน หรือบุคลากรทางการแพทย์แสดงความห่วงใย หรือแนะนำให้คุณลด/เลิกดื่มหรือไม่?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: auditYesNoScale,
+            },
+          },
+        ],
+      },
+      riskRules: {
+        create: [
+          {
+            minScore: 0,
+            maxScore: 7,
+            riskLevel: RiskLevel.LOW,
+            recommendation: 'การดื่มอยู่ในระดับเสี่ยงต่ำ (Low Risk) หรือไม่ดื่ม สุขภาพอยู่ในเกณฑ์ดี ควรคงพฤติกรรมดูแลสุขภาพที่ดีต่อไป',
+            active: true,
+          },
+          {
+            minScore: 8,
+            maxScore: 15,
+            riskLevel: RiskLevel.MODERATE,
+            recommendation: 'การดื่มอยู่ในระดับเสี่ยงอันตราย (Hazardous Drinking) มีโอกาสเกิดปัญหาสุขภาพ แนะนำให้ปรับลดปริมาณและความถี่ในการดื่ม',
+            active: true,
+          },
+          {
+            minScore: 16,
+            maxScore: 19,
+            riskLevel: RiskLevel.HIGH,
+            recommendation: 'การดื่มเริ่มส่งผลเสียต่อสุขภาพกาย สังคม และคนรอบข้าง (Harmful Drinking) แนะนำให้ปรึกษาบุคลากรทางการแพทย์เพื่อวางแผนลดและเลิกดื่ม',
+            active: true,
+          },
+          {
+            minScore: 20,
+            maxScore: 40,
+            riskLevel: RiskLevel.CRITICAL,
+            recommendation: 'มีภาวะพึ่งพิงหรือติดสุรารุนแรง (Alcohol Dependence) จำเป็นต้องได้รับการประเมินและบำบัดรักษาทางการแพทย์จากคลินิกจิตเวช/ยาเสพติดอย่างถูกต้อง',
+            active: true,
+          },
+        ],
+      },
+    },
+  });
+  console.log(`✅ Form AUDIT seeded: ${formAUDIT.title}`);
+
+  // ==========================================
+  // FORM 7: FTND (แบบประเมินการติดบุหรี่)
+  // ==========================================
+  const formFTND = await prisma.screeningForm.upsert({
+    where: { code: 'FTND' },
+    update: {},
+    create: {
+      code: 'FTND',
+      title: 'แบบประเมินการติดบุหรี่ (FTND)',
+      description: 'Fagerström Test for Nicotine Dependence ประเมินระดับการเสพติดสารนิโคตินในผู้สูบบุหรี่',
+      version: 1,
+      status: FormStatus.ACTIVE,
+      questions: {
+        create: [
+          {
+            questionOrder: 1,
+            questionText: '1. ท่านสูบบุหรี่มวนแรกของวันหลังจากตื่นนอนภายในกี่นาที?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: [
+                { label: 'ภายใน 5 นาที', value: 'within_5min', score: 3, order: 1 },
+                { label: '6-30 นาที', value: '6_30min', score: 2, order: 2 },
+                { label: '31-60 นาที', value: '31_60min', score: 1, order: 3 },
+                { label: 'หลังจาก 60 นาที', value: 'after_60min', score: 0, order: 4 },
+              ],
+            },
+          },
+          {
+            questionOrder: 2,
+            questionText: '2. ท่านรู้สึกยากที่จะไม่สูบบุหรี่ในสถานที่ห้ามสูบ เช่น ในโบสถ์/วัด โรงภาพยนตร์ หรือรถประจำทางหรือไม่?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: [
+                { label: 'ใช่', value: 'yes', score: 1, order: 1 },
+                { label: 'ไม่ใช่', value: 'no', score: 0, order: 2 },
+              ],
+            },
+          },
+          {
+            questionOrder: 3,
+            questionText: '3. บุหรี่มวนใดที่ท่านรู้สึกอยากสูบมากที่สุดของวัน?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: [
+                { label: 'มวนแรกในตอนเช้า', value: 'first_morning', score: 1, order: 1 },
+                { label: 'มวนอื่น ๆ', value: 'others', score: 0, order: 2 },
+              ],
+            },
+          },
+          {
+            questionOrder: 4,
+            questionText: '4. ท่านสูบบุหรี่วันละกี่มวน?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: [
+                { label: '10 มวนหรือน้อยกว่า', value: 'le_10', score: 0, order: 1 },
+                { label: '11-20 มวน', value: '11_20', score: 1, order: 2 },
+                { label: '21-30 มวน', value: '21_30', score: 2, order: 3 },
+                { label: '31 มวนขึ้นไป', value: 'ge_31', score: 3, order: 4 },
+              ],
+            },
+          },
+          {
+            questionOrder: 5,
+            questionText: '5. ท่านสูบบุหรี่ในช่วงเช้าหลังตื่นนอนถี่กว่าช่วงเวลาอื่น ๆ ของวันหรือไม่?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: [
+                { label: 'ใช่', value: 'yes', score: 1, order: 1 },
+                { label: 'ไม่ใช่', value: 'no', score: 0, order: 2 },
+              ],
+            },
+          },
+          {
+            questionOrder: 6,
+            questionText: '6. ท่านยังคงสูบบุหรี่แม้ว่าจะเจ็บป่วยจนต้องนอนพักรักษาตัวอยู่บนเตียงเกือบทั้งวันหรือไม่?',
+            questionType: QuestionType.radio,
+            required: true,
+            options: {
+              create: [
+                { label: 'ใช่', value: 'yes', score: 1, order: 1 },
+                { label: 'ไม่ใช่', value: 'no', score: 0, order: 2 },
+              ],
+            },
+          },
+        ],
+      },
+      riskRules: {
+        create: [
+          {
+            minScore: 0,
+            maxScore: 2,
+            riskLevel: RiskLevel.LOW,
+            recommendation: 'ติดนิโคตินในระดับน้อยมาก (Very Low) ท่านสามารถเลิกบุหรี่ได้ด้วยตนเองโดยการปรับเปลี่ยนพฤติกรรมและหลีกเลี่ยงสิ่งกระตุ้น',
+            active: true,
+          },
+          {
+            minScore: 3,
+            maxScore: 4,
+            riskLevel: RiskLevel.LOW,
+            recommendation: 'ติดนิโคตินในระดับน้อย (Low) แนะนำกำหนดวันเลิกบุหรี่ที่ชัดเจน และปรึกษาผู้ใกล้ชิดเพื่อเป็นกำลังใจ',
+            active: true,
+          },
+          {
+            minScore: 5,
+            maxScore: 5,
+            riskLevel: RiskLevel.MODERATE,
+            recommendation: 'ติดนิโคตินในระดับปานกลาง (Moderate) แนะนำขอรับคำปรึกษาจากคลินิกเลิกบุหรี่ รพ.ปลวกแดง หรือโทร 1600 (สายด่วนเลิกบุหรี่)',
+            active: true,
+          },
+          {
+            minScore: 6,
+            maxScore: 7,
+            riskLevel: RiskLevel.HIGH,
+            recommendation: 'ติดนิโคตินในระดับมาก (High) ร่างกายมีความต้องการนิโคตินสูง แนะนำพบแพทย์/เภสัชกรคลินิกเลิกบุหรี่เพื่อพิจารณาใช้ตัวช่วยเลิกบุหรี่',
+            active: true,
+          },
+          {
+            minScore: 8,
+            maxScore: 10,
+            riskLevel: RiskLevel.CRITICAL,
+            recommendation: 'ติดนิโคตินในระดับมากที่สุด (Very High) มีภาวะพึ่งพานิโคตินรุนแรง จำเป็นต้องรับการบำบัดรักษาและการดูแลเฉพาะทางจากคลินิกเลิกบุหรี่',
+            active: true,
+          },
+        ],
+      },
+    },
+  });
+  console.log(`✅ Form FTND seeded: ${formFTND.title}`);
+
   console.log('🎉 PDHPSYCO Database Seeding completed successfully!');
 }
 

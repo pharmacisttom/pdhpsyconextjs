@@ -33,6 +33,10 @@ export const participantSchema = z.object({
     .refine((val) => !val || /^0[689]\d{8}$/.test(val.replace(/\D/g, '')), {
       message: 'เบอร์โทรศัพท์มือถือ 10 หลักไม่ถูกต้อง (เช่น 0812345678)',
     }),
+  birthDate: z.string().max(50).optional().or(z.literal('')).nullable(),
+  address: z.string().max(500).optional().or(z.literal('')).nullable(),
+  educationLevel: z.string().max(100).optional().or(z.literal('')).nullable(),
+  educationRoom: z.string().max(50).optional().or(z.literal('')).nullable(),
   age: z
     .number()
     .min(1, 'อายุต้องมากกว่า 0')

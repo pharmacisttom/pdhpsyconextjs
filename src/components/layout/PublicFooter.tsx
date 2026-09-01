@@ -33,25 +33,35 @@ export function PublicFooter() {
             <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">
               เมนูลัด
             </h4>
-            <ul className="space-y-2 text-sm text-slate-600 dark:text-slate-400">
+            <ul className="space-y-1.5 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
               <li>
-                <Link href="/screening" className="hover:text-teal-600 transition-colors">
-                  ทำแบบคัดกรองโรคซึมเศร้า (2Q/9Q)
+                <Link href="/screening?form=2Q" className="hover:text-teal-600 transition-colors">
+                  แบบคัดกรองซึมเศร้า (2Q/9Q)
                 </Link>
               </li>
               <li>
-                <Link href="/screening" className="hover:text-teal-600 transition-colors">
-                  ประเมินความเครียด (ST-5)
+                <Link href="/screening?form=PHQ-A" className="hover:text-teal-600 transition-colors">
+                  แบบประเมินซึมเศร้าในวัยรุ่น (PHQ-A)
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="hover:text-teal-600 transition-colors">
-                  นโยบายความเป็นส่วนตัว
+                <Link href="/screening?form=AUDIT" className="hover:text-teal-600 transition-colors">
+                  แบบประเมินการดื่มสุรา (AUDIT)
                 </Link>
               </li>
               <li>
-                <Link href="/help" className="hover:text-teal-600 transition-colors">
-                  ขอความช่วยเหลือฉุกเฉิน
+                <Link href="/screening?form=FTND" className="hover:text-teal-600 transition-colors">
+                  แบบประเมินการติดบุหรี่ (FTND)
+                </Link>
+              </li>
+              <li>
+                <Link href="/screening?form=ST-5" className="hover:text-teal-600 transition-colors">
+                  แบบประเมินความเครียด (ST-5)
+                </Link>
+              </li>
+              <li>
+                <Link href="/help" className="hover:text-teal-600 transition-colors text-rose-500 font-medium">
+                  ขอความช่วยเหลือฉุกเฉิน (1323)
                 </Link>
               </li>
             </ul>

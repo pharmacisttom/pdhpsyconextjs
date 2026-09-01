@@ -106,7 +106,7 @@ export default function LandingPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {/* Card 1: 2Q & 9Q */}
             <Card className="hover:shadow-lg hover:border-teal-300 dark:hover:border-teal-800 transition-all duration-300 flex flex-col justify-between">
               <CardHeader>
@@ -131,14 +131,86 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            {/* Card 2: ST-5 */}
+            {/* Card 2: PHQ-A for Adolescents */}
+            <Card className="hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-800 transition-all duration-300 flex flex-col justify-between">
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="rounded-xl bg-blue-100 dark:bg-blue-950 p-2.5 text-blue-700 dark:text-blue-300">
+                    <Sparkles className="h-6 w-6" />
+                  </span>
+                  <Badge variant="moderate">สำหรับวัยรุ่น/นักเรียน</Badge>
+                </div>
+                <CardTitle className="text-xl font-bold">แบบประเมินซึมเศร้าในวัยรุ่น (PHQ-A)</CardTitle>
+                <CardDescription className="text-sm leading-relaxed">
+                  ประเมินสุขภาพใจ อารมณ์ และพฤติกรรมในวัยรุ่นและนักเรียน เพื่อช่วยเหลือและให้คำปรึกษาได้อย่างตรงจุด
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <Link href="/screening?form=PHQ-A">
+                  <Button variant="outline" className="w-full rounded-xl hover:border-blue-500 hover:text-blue-600 flex items-center justify-center gap-1.5">
+                    <span>ทำแบบประเมิน PHQ-A</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Card 3: AUDIT Alcohol Test */}
+            <Card className="hover:shadow-lg hover:border-amber-300 dark:hover:border-amber-800 transition-all duration-300 flex flex-col justify-between">
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="rounded-xl bg-amber-100 dark:bg-amber-950 p-2.5 text-amber-700 dark:text-amber-300">
+                    <Activity className="h-6 w-6" />
+                  </span>
+                  <Badge variant="moderate">10 ข้อคำถาม 3 มิติ</Badge>
+                </div>
+                <CardTitle className="text-xl font-bold">แบบประเมินการดื่มสุรา (AUDIT)</CardTitle>
+                <CardDescription className="text-sm leading-relaxed">
+                  Alcohol Use Disorders Identification Test สำรวจปริมาณ พฤติกรรม และผลกระทบจากการดื่มแอลกอฮอล์
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <Link href="/screening?form=AUDIT">
+                  <Button variant="outline" className="w-full rounded-xl hover:border-amber-500 hover:text-amber-600 flex items-center justify-center gap-1.5">
+                    <span>ทำแบบประเมิน AUDIT</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Card 4: FTND Nicotine/Smoking Test */}
+            <Card className="hover:shadow-lg hover:border-violet-300 dark:hover:border-violet-800 transition-all duration-300 flex flex-col justify-between">
+              <CardHeader>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="rounded-xl bg-violet-100 dark:bg-violet-950 p-2.5 text-violet-700 dark:text-violet-300">
+                    <Activity className="h-6 w-6" />
+                  </span>
+                  <Badge variant="low">6 ข้อคำถาม</Badge>
+                </div>
+                <CardTitle className="text-xl font-bold">แบบประเมินการติดบุหรี่ (FTND)</CardTitle>
+                <CardDescription className="text-sm leading-relaxed">
+                  Fagerström Test for Nicotine Dependence วัดระดับการติดสารนิโคตินเพื่อวางแผนการลดและเลิกบุหรี่
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-2">
+                <Link href="/screening?form=FTND">
+                  <Button variant="outline" className="w-full rounded-xl hover:border-violet-500 hover:text-violet-600 flex items-center justify-center gap-1.5">
+                    <span>ทำแบบประเมิน FTND</span>
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            {/* Card 5: ST-5 */}
             <Card className="hover:shadow-lg hover:border-teal-300 dark:hover:border-teal-800 transition-all duration-300 flex flex-col justify-between">
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">
                   <span className="rounded-xl bg-cyan-100 dark:bg-cyan-950 p-2.5 text-cyan-700 dark:text-cyan-300">
                     <SmilePlus className="h-6 w-6" />
                   </span>
-                  <Badge variant="moderate">ใช้เวลา 1-2 นาที</Badge>
+                  <Badge variant="low">ใช้เวลา 1-2 นาที</Badge>
                 </div>
                 <CardTitle className="text-xl font-bold">แบบประเมินความเครียด (ST-5)</CardTitle>
                 <CardDescription className="text-sm leading-relaxed">
@@ -155,7 +227,7 @@ export default function LandingPage() {
               </CardContent>
             </Card>
 
-            {/* Card 3: 8Q Suicidal Risk */}
+            {/* Card 6: 8Q Suicidal Risk */}
             <Card className="hover:shadow-lg hover:border-rose-300 dark:hover:border-rose-800 transition-all duration-300 flex flex-col justify-between border-rose-100 dark:border-rose-950/60 bg-rose-50/30 dark:bg-rose-950/10">
               <CardHeader>
                 <div className="flex items-center justify-between mb-2">

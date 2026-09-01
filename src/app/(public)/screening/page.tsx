@@ -59,14 +59,18 @@ export default function ScreeningPage() {
   const [publicToken, setPublicToken] = React.useState<string | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
 
-  // Participant Demographic state
+  // Participant Demographic state (Individual Assessment)
   const [consent, setConsent] = React.useState<boolean>(true);
-  const [isAnonymous, setIsAnonymous] = React.useState<boolean>(true);
+  const [isAnonymous, setIsAnonymous] = React.useState<boolean>(false);
   const [citizenId, setCitizenId] = React.useState<string>('');
   const [firstName, setFirstName] = React.useState<string>('');
   const [lastName, setLastName] = React.useState<string>('');
   const [phone, setPhone] = React.useState<string>('');
+  const [birthDate, setBirthDate] = React.useState<string>('');
   const [age, setAge] = React.useState<string>('');
+  const [address, setAddress] = React.useState<string>('');
+  const [educationLevel, setEducationLevel] = React.useState<string>('ประชาชนทั่วไป');
+  const [educationRoom, setEducationRoom] = React.useState<string>('');
   const [gender, setGender] = React.useState<string>('unspecified');
   const [district, setDistrict] = React.useState<string>('ปลวกแดง');
 
@@ -80,6 +84,41 @@ export default function ScreeningPage() {
 
   // Pluak Daeng Sub-districts
   const districts = ['ปลวกแดง', 'ตาสิทธิ์', 'ละหาร', 'แม่น้ำคู้', 'มาบยางพร', 'หนองไร่', 'นอกพื้นที่'];
+
+  // Education Level Options
+  const educationLevels = [
+    'ประถมศึกษา',
+    'มัธยมศึกษาปีที่ 1 (ม.1)',
+    'มัธยมศึกษาปีที่ 2 (ม.2)',
+    'มัธยมศึกษาปีที่ 3 (ม.3)',
+    'มัธยมศึกษาปีที่ 4 (ม.4)',
+    'มัธยมศึกษาปีที่ 5 (ม.5)',
+    'มัธยมศึกษาปีที่ 6 (ม.6)',
+    'ประกาศนียบัตรวิชาชีพ (ปวช.)',
+    'ประกาศนียบัตรวิชาชีพชั้นสูง (ปวส.)',
+    'ปริญญาตรี / อุดมศึกษา',
+    'ประชาชนทั่วไป',
+    'อื่นๆ',
+  ];
+
+  // Auto calculate age from birthDate
+  const handleBirthDateChange = (val: string) => {
+    setBirthDate(val);
+    if (val) {
+      const birth = new Date(val);
+      if (!isNaN(birth.getTime())) {
+        const today = new Date();
+        let calculatedAge = today.getFullYear() - birth.getFullYear();
+        const m = today.getMonth() - birth.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+          calculatedAge--;
+        }
+        if (calculatedAge >= 0 && calculatedAge <= 130) {
+          setAge(calculatedAge.toString());
+        }
+      }
+    }
+  };
 
   // Start screening session
   const handleStartScreening = async (overrideFormCode?: string | React.MouseEvent) => {
@@ -104,6 +143,10 @@ export default function ScreeningPage() {
                 firstName: firstName.trim() || undefined,
                 lastName: lastName.trim() || undefined,
                 phone: phone.trim() || undefined,
+                birthDate: birthDate.trim() || undefined,
+                address: address.trim() || undefined,
+                educationLevel: educationLevel || undefined,
+                educationRoom: educationRoom.trim() || undefined,
               }
             : {}),
         },
@@ -259,6 +302,27 @@ export default function ScreeningPage() {
                     variant: 'moderate',
                   },
                   {
+                    code: 'PHQ-A',
+                    title: 'แบบประเมินซึมเศร้าในวัยรุ่น (PHQ-A)',
+                    desc: '9 คำถาม สำหรับวัยรุ่นและนักเรียน',
+                    badge: 'วัยรุ่น/นักเรียน',
+                    variant: 'moderate',
+                  },
+                  {
+                    code: 'AUDIT',
+                    title: 'แบบประเมินการดื่มสุรา (AUDIT)',
+                    desc: '10 คำถาม 3 มิติ (ปริมาณ, ติดสุรา, ผลกระทบ)',
+                    badge: 'สุรา/แอลกอฮอล์',
+                    variant: 'moderate',
+                  },
+                  {
+                    code: 'FTND',
+                    title: 'แบบประเมินการติดบุหรี่ (FTND)',
+                    desc: '6 คำถาม ประเมินระดับติดนิโคติน',
+                    badge: 'บุหรี่/นิโคติน',
+                    variant: 'low',
+                  },
+                  {
                     code: 'ST-5',
                     title: 'แบบประเมินความเครียด (ST-5)',
                     desc: '5 คำถาม วัดระดับความเครียดสะสม',
@@ -296,39 +360,28 @@ export default function ScreeningPage() {
               </CardContent>
             </Card>
 
-            {/* Demographics & Anonymous Toggle */}
+            {/* Demographics & Individual Assessment */}
             <Card>
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-base font-semibold">2. ข้อมูลผู้รับบริการ (ไม่บังคับ)</CardTitle>
+                  <CardTitle className="text-base font-semibold">2. ข้อมูลผู้รับการประเมินรายบุคคล</CardTitle>
                   <button
                     type="button"
                     onClick={() => setIsAnonymous(!isAnonymous)}
                     className="text-xs font-semibold text-teal-600 dark:text-teal-400 hover:underline"
                   >
-                    {isAnonymous ? '+ ระบุข้อมูลติดต่อเพื่อติดตามผล' : '✓ ประเมินแบบนิรนาม (ไม่ระบุชื่อ)'}
+                    {isAnonymous ? '+ กรอกข้อมูลรายบุคคลเพื่อติดตามผล' : '✓ ประเมินแบบนิรนาม (ไม่ระบุตัวตน)'}
                   </button>
                 </div>
                 <CardDescription className="text-xs">
                   {isAnonymous
                     ? 'โหมดนิรนาม: ข้อมูลของท่านจะไม่ถูกผูกกับชื่อหรือเลขบัตรประชาชน'
-                    : 'ระบุข้อมูลเพื่อให้ทีมแพทย์/พยาบาล รพ.ปลวกแดง สามารถติดต่อให้คำปรึกษาหากมีความเสี่ยงสูง'}
+                    : 'ข้อมูลรายบุคคลจะถูกเข้ารหัสความปลอดภัย AES-256-GCM ตามมาตรฐาน PDPA เพื่อการดูแลรักษาที่ต่อเนื่อง'}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                      อายุ (ปี)
-                    </label>
-                    <input
-                      type="number"
-                      placeholder="เช่น 28"
-                      value={age}
-                      onChange={(e) => setAge(e.target.value)}
-                      className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm bg-white dark:bg-slate-900"
-                    />
-                  </div>
+                {/* General Basic Info */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
                       เพศ
@@ -362,16 +415,19 @@ export default function ScreeningPage() {
                   </div>
                 </div>
 
+                {/* Individual PII Details */}
                 {!isAnonymous && (
-                  <div className="p-4 rounded-2xl bg-teal-50/50 dark:bg-teal-950/20 border border-teal-100 dark:border-teal-900/40 space-y-3">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-teal-50/50 dark:bg-teal-950/20 border border-teal-100 dark:border-teal-900/40 space-y-4">
                     <div className="flex items-center gap-1.5 text-xs text-teal-800 dark:text-teal-300 font-semibold">
                       <ShieldCheck className="h-4 w-4" />
-                      <span>ข้อมูลส่วนบุคคลจะถูกเข้ารหัส AES-256-GCM ทันที</span>
+                      <span>ข้อมูลส่วนบุคคลได้รับการเข้ารหัสความปลอดภัย AES-256-GCM ตามมาตรฐาน PDPA</span>
                     </div>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      {/* 1. ชื่อ-นามสกุล */}
                       <div>
                         <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                          ชื่อ
+                          1. ชื่อ
                         </label>
                         <input
                           type="text"
@@ -393,9 +449,49 @@ export default function ScreeningPage() {
                           className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm bg-white dark:bg-slate-900"
                         />
                       </div>
+
+                      {/* 2. วันเดือนปีเกิด & 3. อายุ */}
                       <div>
                         <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                          เบอร์โทรศัพท์สำหรับติดต่อ
+                          2. วันเดือนปีเกิด (ค.ศ. หรือ พ.ศ.)
+                        </label>
+                        <input
+                          type="date"
+                          value={birthDate}
+                          onChange={(e) => handleBirthDateChange(e.target.value)}
+                          className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm bg-white dark:bg-slate-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          3. อายุ (ปี)
+                        </label>
+                        <input
+                          type="number"
+                          placeholder="เช่น 16 (คำนวณอัตโนมัติจากวันเกิด)"
+                          value={age}
+                          onChange={(e) => setAge(e.target.value)}
+                          className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm bg-white dark:bg-slate-900"
+                        />
+                      </div>
+
+                      {/* 4. เลขบัตรประชาชน & 6. เบอร์โทรศัพท์ */}
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          4. เลขบัตรประชาชน (13 หลัก)
+                        </label>
+                        <input
+                          type="text"
+                          maxLength={13}
+                          placeholder="3560xxxxxxxxx"
+                          value={citizenId}
+                          onChange={(e) => setCitizenId(e.target.value.replace(/\D/g, ''))}
+                          className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm bg-white dark:bg-slate-900"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          6. เบอร์โทรศัพท์
                         </label>
                         <input
                           type="tel"
@@ -405,16 +501,47 @@ export default function ScreeningPage() {
                           className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm bg-white dark:bg-slate-900"
                         />
                       </div>
-                      <div>
+
+                      {/* 5. ที่อยู่ปัจจุบัน */}
+                      <div className="sm:col-span-2">
                         <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                          เลขบัตรประชาชน (13 หลัก)
+                          5. ที่อยู่ปัจจุบัน
                         </label>
                         <input
                           type="text"
-                          maxLength={13}
-                          placeholder="3560xxxxxxxxx"
-                          value={citizenId}
-                          onChange={(e) => setCitizenId(e.target.value.replace(/\D/g, ''))}
+                          placeholder="บ้านเลขที่ หมู่ ซอย ถนน (เช่น 123/4 หมู่ 2 ต.ปลวกแดง)"
+                          value={address}
+                          onChange={(e) => setAddress(e.target.value)}
+                          className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm bg-white dark:bg-slate-900"
+                        />
+                      </div>
+
+                      {/* 7. ชั้นปีที่ศึกษา & 8. ห้อง */}
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          7. ชั้นปีที่ศึกษา
+                        </label>
+                        <select
+                          value={educationLevel}
+                          onChange={(e) => setEducationLevel(e.target.value)}
+                          className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm bg-white dark:bg-slate-900"
+                        >
+                          {educationLevels.map((lvl) => (
+                            <option key={lvl} value={lvl}>
+                              {lvl}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
+                          8. ห้อง / กลุ่มเรียน
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="เช่น ห้อง 1, ห้อง 2/3"
+                          value={educationRoom}
+                          onChange={(e) => setEducationRoom(e.target.value)}
                           className="w-full h-11 px-3 rounded-xl border border-slate-200 dark:border-slate-800 text-sm bg-white dark:bg-slate-900"
                         />
                       </div>

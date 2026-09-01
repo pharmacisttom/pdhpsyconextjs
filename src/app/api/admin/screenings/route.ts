@@ -62,6 +62,8 @@ export async function GET(req: Request) {
       const lastNameDecrypted = p?.lastNameEncrypted ? decryptPII(p.lastNameEncrypted) : null;
       const citizenIdDecrypted = p?.citizenIdEncrypted ? decryptPII(p.citizenIdEncrypted) : null;
       const phoneDecrypted = p?.phoneEncrypted ? decryptPII(p.phoneEncrypted) : null;
+      const birthDateDecrypted = p?.birthDateEncrypted ? decryptPII(p.birthDateEncrypted) : null;
+      const addressDecrypted = p?.addressEncrypted ? decryptPII(p.addressEncrypted) : null;
 
       const isAuthorizedToReveal = revealPII && (session.user as any)?.role !== 'VIEWER';
 
@@ -85,6 +87,10 @@ export async function GET(req: Request) {
           phone: isAuthorizedToReveal
             ? phoneDecrypted || '-'
             : maskPhone(phoneDecrypted),
+          birthDate: isAuthorizedToReveal ? birthDateDecrypted : null,
+          address: isAuthorizedToReveal ? addressDecrypted : null,
+          educationLevel: p?.educationLevel || null,
+          educationRoom: p?.educationRoom || null,
           age: p?.age || null,
           gender: p?.gender || 'unspecified',
           district: p?.district || null,

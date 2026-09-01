@@ -218,6 +218,10 @@ model Participant {
   firstNameEncrypted String?          @map("first_name_encrypted") @db.Text
   lastNameEncrypted  String?          @map("last_name_encrypted") @db.Text
   phoneEncrypted     String?          @map("phone_encrypted") @db.Text
+  birthDateEncrypted String?          @map("birth_date_encrypted") @db.Text
+  addressEncrypted   String?          @map("address_encrypted") @db.Text
+  educationLevel     String?          @map("education_level")
+  educationRoom      String?          @map("education_room")
   age                Int?
   gender             String?
   district           String?
@@ -231,6 +235,7 @@ model Participant {
   @@index([screeningSessionId])
   @@index([age])
   @@index([gender])
+  @@index([educationLevel])
   @@index([createdAt])
 }
 
