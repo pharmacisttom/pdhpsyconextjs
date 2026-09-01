@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import Link from 'next/link';
 import { PublicNavbar } from '@/components/layout/PublicNavbar';
@@ -5,6 +7,7 @@ import { PublicFooter } from '@/components/layout/PublicFooter';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { QRCodeModal } from '@/components/ui/qr-code';
 import {
   HeartHandshake,
   ShieldCheck,
@@ -18,9 +21,18 @@ import {
   Lock,
   Clock,
   HelpCircle,
+  QrCode,
 } from 'lucide-react';
 
 export default function LandingPage() {
+  const [isQRModalOpen, setIsQRModalOpen] = React.useState(false);
+  const [selectedQRForm, setSelectedQRForm] = React.useState<string>('ALL');
+
+  const openQRFor = (formCode = 'ALL') => {
+    setSelectedQRForm(formCode);
+    setIsQRModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950">
       <PublicNavbar />
@@ -63,6 +75,15 @@ export default function LandingPage() {
                   <ArrowRight className="h-4 w-4 ml-1" />
                 </Button>
               </Link>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => openQRFor('ALL')}
+                className="w-full sm:w-auto py-6 rounded-2xl flex items-center justify-center gap-2 text-slate-700 dark:text-slate-200 border-teal-200 hover:bg-teal-50/50"
+              >
+                <QrCode className="h-5 w-5 text-teal-600" />
+                <span>สแกน QR Code</span>
+              </Button>
               <Link href="/help" className="w-full sm:w-auto">
                 <Button
                   variant="outline"
@@ -70,7 +91,7 @@ export default function LandingPage() {
                   className="w-full sm:w-auto py-6 rounded-2xl flex items-center justify-center gap-2 text-slate-700 dark:text-slate-200"
                 >
                   <PhoneCall className="h-4 w-4 text-rose-500" />
-                  <span>ขอความช่วยเหลือด่วน (1323)</span>
+                  <span>สายด่วน (1323)</span>
                 </Button>
               </Link>
             </div>
@@ -254,6 +275,36 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* QR Code Banner Section for Hospital & School Promotion */}
+      <section className="py-12 bg-teal-50/60 dark:bg-slate-900/60 border-b border-slate-200/80 dark:border-slate-800">
+        <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900 border border-teal-200/80 dark:border-teal-800/80 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="flex items-center gap-4 text-center md:text-left flex-col md:flex-row">
+              <div className="p-3.5 rounded-2xl bg-teal-100 dark:bg-teal-950 text-teal-700 dark:text-teal-300">
+                <QrCode className="h-8 w-8" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                  สแกน QR Code เพื่อทำแบบประเมินผ่านมือถือ
+                </h3>
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-xl">
+                  บุคลากรทางการแพทย์ ครูแนะแนว หรือประชาชน สามารถเปิดและดาวน์โหลด QR Code สำหรับประชาสัมพันธ์ตามจุดบริการ คลินิก หรือโรงเรียนได้ทันที
+                </p>
+              </div>
+            </div>
+            <Button
+              variant="teal"
+              size="lg"
+              onClick={() => openQRFor('ALL')}
+              className="rounded-2xl px-6 py-5 flex items-center gap-2 shadow-md shrink-0 font-bold"
+            >
+              <QrCode className="h-5 w-5" />
+              <span>เปิดดู & ดาวน์โหลด QR Code</span>
+            </Button>
+          </div>
+        </div>
+      </section>
+
       {/* Emergency Crisis Help Banner */}
       <section className="py-12 bg-gradient-to-r from-teal-700 via-cyan-800 to-blue-900 text-white">
         <div className="container max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -286,6 +337,13 @@ export default function LandingPage() {
       </section>
 
       <PublicFooter />
+
+      {/* Global QR Code Modal */}
+      <QRCodeModal
+        isOpen={isQRModalOpen}
+        onClose={() => setIsQRModalOpen(false)}
+        initialFormCode={selectedQRForm}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
+import { QRCodeModal } from '@/components/ui/qr-code';
 import {
   ClipboardList,
   Search,
@@ -17,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Download,
+  QrCode,
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -30,6 +32,7 @@ export default function ScreeningsManagementPage() {
   const [selectedForm, setSelectedForm] = React.useState('');
   const [selectedRisk, setSelectedRisk] = React.useState('');
   const [revealPII, setRevealPII] = React.useState(false);
+  const [isQRModalOpen, setIsQRModalOpen] = React.useState(false);
 
   // Selected item modal state
   const [selectedScreening, setSelectedScreening] = React.useState<any | null>(null);
@@ -82,7 +85,17 @@ export default function ScreeningsManagementPage() {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+          <Button
+            variant="teal"
+            size="sm"
+            onClick={() => setIsQRModalOpen(true)}
+            className="rounded-xl text-xs flex items-center gap-1.5 shadow-sm font-semibold"
+          >
+            <QrCode className="h-4 w-4" />
+            <span>สร้าง / พิมพ์ QR Code</span>
+          </Button>
+
           <Button
             variant={revealPII ? 'danger' : 'outline'}
             size="sm"
@@ -363,6 +376,9 @@ export default function ScreeningsManagementPage() {
           </div>
         </Modal>
       )}
+
+      {/* QR Code Generator Modal */}
+      <QRCodeModal isOpen={isQRModalOpen} onClose={() => setIsQRModalOpen(false)} />
     </div>
   );
 }

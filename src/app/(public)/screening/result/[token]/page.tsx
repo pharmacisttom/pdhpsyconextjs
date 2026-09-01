@@ -6,6 +6,7 @@ import { PublicFooter } from '@/components/layout/PublicFooter';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { QRCodeDisplay } from '@/components/ui/qr-code';
 import { ScreeningService } from '@/services/screening.service';
 import {
   HeartPulse,
@@ -18,6 +19,7 @@ import {
   RotateCcw,
   Sparkles,
   Calendar,
+  QrCode,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -234,8 +236,39 @@ export default async function ScreeningResultPage({ params }: ResultPageProps) {
           </Card>
         )}
 
+        {/* QR Code for Showing Result to Healthcare Providers */}
+        <Card className="border border-slate-200/80 dark:border-slate-800 bg-white/90 dark:bg-slate-900/90 shadow-sm overflow-hidden">
+          <CardContent className="p-6 flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div className="space-y-2 text-center sm:text-left flex-1">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-teal-50 dark:bg-teal-950/60 text-[10px] font-bold text-teal-700 dark:text-teal-300 border border-teal-200/60 dark:border-teal-800">
+                <QrCode className="h-3.5 w-3.5" />
+                <span>รหัสบันทึกผลการประเมิน</span>
+              </div>
+              <h3 className="text-base font-bold text-slate-900 dark:text-white">
+                QR Code สำหรับแสดงผลต่อเจ้าหน้าที่
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                ท่านสามารถบันทึกภาพหน้าจอนี้ หรือแสดง QR Code ต่อเจ้าหน้าที่พยาบาลและแพทย์ คลินิกจิตเวช รพ.ปลวกแดง เพื่อดึงข้อมูลผลการประเมินได้อย่างรวดเร็วและเป็นความลับ
+              </p>
+              <div className="pt-1">
+                <span className="text-[11px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg">
+                  Token: {token}
+                </span>
+              </div>
+            </div>
+            <div className="shrink-0 p-3 bg-white rounded-2xl border border-slate-100 shadow-sm">
+              <QRCodeDisplay
+                url={`https://pdhpsyco.pluakdaenghospital.cloud/screening/result/${token}`}
+                size={140}
+                label="สแกนเพื่อเปิดผลตรวจ"
+                subLabel="รพ.ปลวกแดง"
+              />
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Suggested Next Steps / Next Assessments */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
           <Link href="/screening" className="w-full sm:w-auto">
             <Button variant="outline" className="w-full sm:w-auto rounded-xl flex items-center gap-2 text-xs">
               <RotateCcw className="h-4 w-4" />
