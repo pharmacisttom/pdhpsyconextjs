@@ -37,6 +37,7 @@ export const participantSchema = z.object({
   address: z.string().max(500).optional().or(z.literal('')).nullable(),
   educationLevel: z.string().max(100).optional().or(z.literal('')).nullable(),
   educationRoom: z.string().max(50).optional().or(z.literal('')).nullable(),
+  teacherName: z.string().max(200).optional().or(z.literal('')).nullable(),
   age: z
     .number()
     .min(1, 'อายุต้องมากกว่า 0')

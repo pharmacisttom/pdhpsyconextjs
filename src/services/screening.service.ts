@@ -21,6 +21,7 @@ export interface StartSessionInput {
     address?: string | null;
     educationLevel?: string | null;
     educationRoom?: string | null;
+    teacherName?: string | null;
     age?: number | null;
     gender?: string | null;
     district?: string | null;
@@ -88,6 +89,7 @@ export class ScreeningService {
             addressEncrypted: encryptPII(input.participant.address || undefined),
             educationLevel: input.participant.educationLevel || null,
             educationRoom: input.participant.educationRoom || null,
+            teacherNameEncrypted: encryptPII(input.participant.teacherName || undefined),
             age: input.participant.age,
             gender: input.participant.gender,
             district: input.participant.district,
@@ -284,6 +286,96 @@ export class ScreeningService {
       gender: session.participant?.gender,
       needsUrgentHelp: isHigh,
       urgentGuidance: RiskService.getUrgentActionGuidance(session.riskLevel || RiskLevel.LOW),
+    };
+  }
+
+  /**
+   * Retrieves unified bundled results for multiple public tokens
+   */
+  static async getBundleResults(publicTokens: string[]) {
+    if (!publicTokens || publicTokens.length === 0) {
+      throw new Error('ไม่พบรหัสผลการประเมิน');
+    }
+
+    const sessions = await prisma.screeningSession.findMany({
+      where: {
+        publicToken: { in: publicTokens },
+        status: SessionStatus.COMPLETED,
+      },
+      include: {
+        form: {
+          include: {
+            riskRules: true,
+          },
+        },
+        participant: true,
+      },
+      orderBy: { createdAt: 'asc' },
+    });
+
+    if (sessions.length === 0) {
+      throw new Error('ไม่พบผลการประเมินที่ระบุ');
+    }
+
+    // Determine overall risk
+    const riskPriority: Record<RiskLevel, number> = {
+      CRITICAL: 4,
+      HIGH: 3,
+      MODERATE: 2,
+      LOW: 1,
+    };
+
+    let highestRisk: RiskLevel = RiskLevel.LOW;
+    let highestPriority = 1;
+
+    for (const s of sessions) {
+      const rLevel = s.riskLevel || RiskLevel.LOW;
+      const prio = riskPriority[rLevel] || 1;
+      if (prio > highestPriority) {
+        highestPriority = prio;
+        highestRisk = rLevel;
+      }
+    }
+
+    const results = sessions.map((s) => {
+      let recommendation = 'ไม่มีข้อแนะนำเพิ่มเติม';
+      if (s.riskLevel) {
+        const rule = s.form.riskRules.find((r) => r.riskLevel === s.riskLevel);
+        if (rule) recommendation = rule.recommendation;
+      }
+
+      const rLevel = s.riskLevel || RiskLevel.LOW;
+
+      return {
+        publicToken: s.publicToken,
+        formCode: s.form.code,
+        formTitle: s.form.title,
+        totalScore: s.totalScore || 0,
+        riskLevel: rLevel,
+        recommendation,
+        completedAt: s.completedAt?.toISOString() || s.createdAt.toISOString(),
+      };
+    });
+
+    const isHighOrCritical = highestRisk === RiskLevel.HIGH || highestRisk === RiskLevel.CRITICAL;
+    const firstParticipant = sessions[0]?.participant;
+
+    return {
+      tokens: publicTokens,
+      primaryToken: publicTokens[publicTokens.length - 1],
+      overallRiskLevel: highestRisk,
+      needsUrgentHelp: isHighOrCritical,
+      urgentGuidance: RiskService.getUrgentActionGuidance(highestRisk),
+      participant: firstParticipant
+        ? {
+            age: firstParticipant.age,
+            gender: firstParticipant.gender,
+            district: firstParticipant.district,
+            educationLevel: firstParticipant.educationLevel,
+            educationRoom: firstParticipant.educationRoom,
+          }
+        : null,
+      results,
     };
   }
 }

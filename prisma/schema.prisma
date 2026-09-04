@@ -222,6 +222,7 @@ model Participant {
   addressEncrypted   String?          @map("address_encrypted") @db.Text
   educationLevel     String?          @map("education_level")
   educationRoom      String?          @map("education_room")
+  teacherNameEncrypted String?        @map("teacher_name_encrypted") @db.Text
   age                Int?
   gender             String?
   district           String?

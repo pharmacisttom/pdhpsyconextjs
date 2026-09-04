@@ -364,6 +364,7 @@ export default function ScreeningsManagementPage() {
                 <p>6. เบอร์โทรศัพท์: <strong>{selectedScreening.participant?.phone}</strong></p>
                 <p>7. ชั้นปีที่ศึกษา: <strong>{selectedScreening.participant?.educationLevel || '-'}</strong></p>
                 <p>8. ห้อง / กลุ่มเรียน: <strong>{selectedScreening.participant?.educationRoom || '-'}</strong></p>
+                <p className="sm:col-span-2">9. คุณครู / ครูที่ปรึกษา: <strong>{selectedScreening.participant?.teacherName || '-'}</strong></p>
                 <p className="sm:col-span-2">5. ที่อยู่ปัจจุบัน: <strong>{selectedScreening.participant?.address || '-'}</strong></p>
               </div>
             </div>

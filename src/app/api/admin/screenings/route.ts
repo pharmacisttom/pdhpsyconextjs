@@ -64,6 +64,7 @@ export async function GET(req: Request) {
       const phoneDecrypted = p?.phoneEncrypted ? decryptPII(p.phoneEncrypted) : null;
       const birthDateDecrypted = p?.birthDateEncrypted ? decryptPII(p.birthDateEncrypted) : null;
       const addressDecrypted = p?.addressEncrypted ? decryptPII(p.addressEncrypted) : null;
+      const teacherNameDecrypted = p?.teacherNameEncrypted ? decryptPII(p.teacherNameEncrypted) : null;
 
       const isAuthorizedToReveal = revealPII && (session.user as any)?.role !== 'VIEWER';
 
@@ -89,6 +90,7 @@ export async function GET(req: Request) {
             : maskPhone(phoneDecrypted),
           birthDate: isAuthorizedToReveal ? birthDateDecrypted : null,
           address: isAuthorizedToReveal ? addressDecrypted : null,
+          teacherName: isAuthorizedToReveal ? teacherNameDecrypted : (teacherNameDecrypted ? `${teacherNameDecrypted.slice(0, 3)}***` : null),
           educationLevel: p?.educationLevel || null,
           educationRoom: p?.educationRoom || null,
           age: p?.age || null,
